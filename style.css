@@ -1,0 +1,9 @@
+:root {
+  --color: red;
+}
+
+#current_color {
+  height: 100px;
+  width: 100px;
+  background-color: var(--color);
+}
