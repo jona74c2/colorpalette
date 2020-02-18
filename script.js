@@ -5,7 +5,7 @@ window.addEventListener("DOMContentLoaded", start);
 window.addEventListener("click", setColor);
 
 let colorArray = ["", "", "", "", ""];
-//not sure why, but I cant return a html button value i an function, so a global is needed
+//not sure why, but I cant return a html button value in a function, so a global is used
 let colorPaletteChoice;
 
 let HTML = {};
@@ -28,24 +28,195 @@ function setColor() {
   checkRadio();
   //call function that matches selection
   window[colorPaletteChoice](hslObject);
-  console.log(colorArray);
+  //console.log(colorArray);
   //analogous(hslObject);
   HTML.colorSquare.forEach((square, index) => {
-    console.log("ColorArray: " + colorArray[index]);
+    //console.log("ColorArray: " + colorArray[index]);
     let hslColor = `hsl(${colorArray[index].h.toFixed(1)},${colorArray[index].s.toFixed(1)}\%,${colorArray[index].l.toFixed(1)}\%)`;
-    console.log("hslColor: " + hslColor);
+    //console.log("hslColor: " + hslColor);
     square.querySelector(".current_color").style.setProperty("--color", hslColor);
 
-    square.querySelector(".hex").textContent = `Hex: ${HTML.color.value}`;
-    let rgbObject = hexToRGB(HTML.color.value);
-    square.querySelector(".rgb").textContent = `rgb(${rgbObject.r},${rgbObject.g},${rgbObject.b})`;
+    //let rgbObject = hexToRGB(HTML.color.value);
+    let rgbColor = HSLToRGB(colorArray[index].h, colorArray[index].s, colorArray[index].l);
+    square.querySelector(".rgb").textContent = `rgb(${rgbColor.r},${rgbColor.g},${rgbColor.b})`;
     //let hslObject = hexToHSL(HTML.color.value);
     square.querySelector(".hsl").textContent = hslColor;
+
+    let hexColor = RGBToHex(rgbColor.r, rgbColor.g, rgbColor.b);
+    square.querySelector(".hex").textContent = `Hex: ${hexColor}`;
   });
   /* HTML.colorBox.forEach(colorBox => {
     // colorBox.style.setProperty("--color", HTML.color.value);
   }); */
+  //console.log(colorArray);
+}
+
+/* function analogous(hsl) {
+  let analogousArray = [-40, -20, 20, 40];
+  const colorArray = [];
+  for (let i = 0; i < analogous.length; i++) {
+    colorArray.push(hsl);
+    colorArray[i].h = hsl.h + analogousArray[i];
+
+    if (colorArray[i].h < 0) {
+      colorArray[i].h = colorArray[i].h + 360;
+    }
+    console.log(colorArray[i]);
+  }
   console.log(colorArray);
+  return colorArray;
+} */
+
+function checkRadio() {
+  HTML.radio.forEach(button => {
+    if (button.checked == true) {
+      //console.log("button value " + button.value);
+      colorPaletteChoice = button.value;
+      //return "" + value;
+    }
+  });
+}
+
+function analogous(hsl) {
+  let analogousArray = ["-40", "-20", "0", "20", "40"];
+  for (let i = 0; i < colorArray.length; i++) {
+    colorArray[i] = Object.create(hsl);
+    //console.log("analogousArray[i]: " + analogousArray[i]);
+    colorArray[i].h = Number(hsl.h) + Number(analogousArray[i]);
+
+    if (colorArray[i].h < 0) {
+      colorArray[i].h = colorArray[i].h + 360;
+    }
+    //console.log("colorArray: " + colorArray[i]);
+    //console.log("h values: " + colorArray[i].h);
+  }
+}
+
+function monochromatic(hsl) {
+  let bool = false;
+  let analogousArray = ["-20", "-20", "0", "20", "20"];
+  for (let i = 0; i < colorArray.length; i++) {
+    colorArray[i] = Object.create(hsl);
+    //console.log("analogousArray[i]: " + analogousArray[i]);
+    if (bool) {
+      colorArray[i].s += Number(analogousArray[i]);
+      bool = false;
+    } else {
+      colorArray[i].l += Number(analogousArray[i]);
+      bool = true;
+    }
+
+    if (colorArray[i].h < 0) {
+      colorArray[i].h = colorArray[i].h + 360;
+    }
+  }
+}
+
+function triad(hsl) {
+  let bool = false;
+  let analogousArray = ["-120", "120", "0", "-120", "120"];
+  for (let i = 0; i < colorArray.length; i++) {
+    colorArray[i] = Object.create(hsl);
+    //console.log("analogousArray[i]: " + analogousArray[i]);
+    colorArray[i].h += Number(analogousArray[i]);
+    if (bool) {
+      colorArray[i].l += +20;
+      bool = false;
+    } else {
+      bool = true;
+    }
+
+    if (colorArray[i].h < 0) {
+      colorArray[i].h = colorArray[i].h + 360;
+    }
+  }
+}
+
+function complementary(hsl) {
+  let bool = false;
+  let analogousArray = ["180", "180", "0", "0", "0"];
+  for (let i = 0; i < colorArray.length; i++) {
+    colorArray[i] = Object.create(hsl);
+    //console.log("analogousArray[i]: " + analogousArray[i]);
+    colorArray[i].h += Number(analogousArray[i]);
+    if (bool) {
+      colorArray[i].l += +20;
+      bool = false;
+    } else {
+      bool = true;
+    }
+
+    if (colorArray[i].h < 0) {
+      colorArray[i].h = colorArray[i].h + 360;
+    }
+  }
+}
+function compound(hsl) {
+  let bool = false;
+  let analogousArray = ["180", "20", "0", "180", "-20"];
+  for (let i = 0; i < colorArray.length; i++) {
+    colorArray[i] = Object.create(hsl);
+    //console.log("analogousArray[i]: " + analogousArray[i]);
+    colorArray[i].h += Number(analogousArray[i]);
+    if (!bool) {
+      colorArray[i].l += +20;
+      bool = true;
+    }
+    if (colorArray[i].h < 0) {
+      colorArray[i].h = colorArray[i].h + 360;
+    }
+  }
+}
+function shades(hsl) {
+  let analogousArray = ["-30", "-15", "0", "15", "30"];
+  for (let i = 0; i < colorArray.length; i++) {
+    colorArray[i] = Object.create(hsl);
+    //console.log("analogousArray[i]: " + analogousArray[i]);
+    colorArray[i].l += Number(analogousArray[i]);
+  }
+}
+
+// This function is taken from https://css-tricks.com/converting-color-spaces-in-javascript/
+function HSLToRGB(h, s, l) {
+  s /= 100;
+  l /= 100;
+
+  let c = (1 - Math.abs(2 * l - 1)) * s,
+    x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
+    m = l - c / 2,
+    r = 0,
+    g = 0,
+    b = 0;
+  if (0 <= h && h < 60) {
+    r = c;
+    g = x;
+    b = 0;
+  } else if (60 <= h && h < 120) {
+    r = x;
+    g = c;
+    b = 0;
+  } else if (120 <= h && h < 180) {
+    r = 0;
+    g = c;
+    b = x;
+  } else if (180 <= h && h < 240) {
+    r = 0;
+    g = x;
+    b = c;
+  } else if (240 <= h && h < 300) {
+    r = x;
+    g = 0;
+    b = c;
+  } else if (300 <= h && h < 360) {
+    r = c;
+    g = 0;
+    b = x;
+  }
+  r = Math.round((r + m) * 255);
+  g = Math.round((g + m) * 255);
+  b = Math.round((b + m) * 255);
+  return { r, g, b };
+  //return "rgb(" + r + "," + g + "," + b + ")";
 }
 
 function hexToRGB(hex) {
@@ -104,43 +275,15 @@ function hexToHSL(hex) {
   return { h, s, l };
 }
 
-function analogous(hsl) {
-  let analogousArray = ["-40", "-20", "0", "20", "40"];
-  for (let i = 0; i < colorArray.length; i++) {
-    colorArray[i] = Object.create(hsl);
-    console.log("analogousArray[i]: " + analogousArray[i]);
-    colorArray[i].h = Number(hsl.h) + Number(analogousArray[i]);
+// This function is taken from https://css-tricks.com/converting-color-spaces-in-javascript/
+function RGBToHex(r, g, b) {
+  r = r.toString(16);
+  g = g.toString(16);
+  b = b.toString(16);
 
-    if (colorArray[i].h < 0) {
-      colorArray[i].h = colorArray[i].h + 360;
-    }
-    console.log("colorArray: " + colorArray[i]);
-    console.log("h values: " + colorArray[i].h);
-  }
-}
+  if (r.length == 1) r = "0" + r;
+  if (g.length == 1) g = "0" + g;
+  if (b.length == 1) b = "0" + b;
 
-/* function analogous(hsl) {
-  let analogousArray = [-40, -20, 20, 40];
-  const colorArray = [];
-  for (let i = 0; i < analogous.length; i++) {
-    colorArray.push(hsl);
-    colorArray[i].h = hsl.h + analogousArray[i];
-
-    if (colorArray[i].h < 0) {
-      colorArray[i].h = colorArray[i].h + 360;
-    }
-    console.log(colorArray[i]);
-  }
-  console.log(colorArray);
-  return colorArray;
-} */
-
-function checkRadio() {
-  HTML.radio.forEach(button => {
-    if (button.checked == true) {
-      console.log("button value " + button.value);
-      colorPaletteChoice = button.value;
-      //return "" + value;
-    }
-  });
+  return "#" + r + g + b;
 }
