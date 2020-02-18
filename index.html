@@ -7,11 +7,47 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
-    <input type="color" />
-    <div id="current_color"></div>
-    <div id="hex">Hex:</div>
-    <div id="rgb">RGB:</div>
-    <div id="hsl">HSL:</div>
+    <div id="radio_buttons">
+      <div class="radio_container"><input type="radio" name="palette_color_variations" value="ANALOGOUS" aria-checked="false" checked />Analog</div>
+      <div class="radio_container"><input type="radio" name="palette_color_variations" value="MONOCHROMATIC" />Monochromatic</div>
+      <div class="radio_container"><input type="radio" name="palette_color_variations" value="TRIAD" />Triad</div>
+      <div class="radio_container"><input type="radio" name="palette_color_variations" value="COMPLEMENTARY" />Complementary</div>
+      <div class="radio_container"><input type="radio" name="palette_color_variations" value="COMPOUND" />Compound</div>
+      <div class="radio_container"><input type="radio" name="palette_color_variations" value="SHADES" />Shades</div>
+    </div>
+    <section id="colors">
+      <div class="color_square">
+        <div class="current_color"></div>
+        <div class="hex">Hex:</div>
+        <div class="rgb">RGB:</div>
+        <div class="hsl">HSL:</div>
+      </div>
+      <div class="color_square">
+        <div class="current_color"></div>
+        <div class="hex">Hex:</div>
+        <div class="rgb">RGB:</div>
+        <div class="hsl">HSL:</div>
+      </div>
+      <div class="color_square">
+        Select Color: <input id="color_input" type="color" />
+        <div class="current_color"></div>
+        <div class="hex">Hex:</div>
+        <div class="rgb">RGB:</div>
+        <div class="hsl">HSL:</div>
+      </div>
+      <div class="color_square">
+        <div class="current_color"></div>
+        <div class="hex">Hex:</div>
+        <div class="rgb">RGB:</div>
+        <div class="hsl">HSL:</div>
+      </div>
+      <div class="color_square">
+        <div class="current_color"></div>
+        <div class="hex">Hex:</div>
+        <div class="rgb">RGB:</div>
+        <div class="hsl">HSL:</div>
+      </div>
+    </section>
     <script src="script.js"></script>
   </body>
 </html>

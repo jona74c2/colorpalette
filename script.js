@@ -4,31 +4,41 @@ window.addEventListener("DOMContentLoaded", start);
 
 window.addEventListener("click", setColor);
 
+let colorArray = [];
 let HTML = {};
 function start() {
-  HTML.color = document.querySelector("input");
-  HTML.colorBox = document.querySelector("#current_color");
-  HTML.hex = document.querySelector("#hex");
-  HTML.rgb = document.querySelector("#rgb");
-  HTML.hsl = document.querySelector("#hsl");
+  HTML.colorSquare = document.querySelectorAll(".color_square");
+  HTML.color = document.querySelector("#color_input");
+  HTML.colorBox = document.querySelectorAll(".current_color");
+  HTML.hex = document.querySelectorAll(".hex");
+  HTML.rgb = document.querySelectorAll(".rgb");
+  HTML.hsl = document.querySelectorAll(".hsl");
 }
 
 function setColor() {
-  HTML.colorBox.style.setProperty("--color", HTML.color.value);
-  console.log(HTML.color.value);
-  HTML.hex.textContent = `Hex: ${HTML.color.value}`;
-  HTML.rgb.textContent = hexToRGB(HTML.color.value);
-  HTML.hsl.textContent = hexToHSL(HTML.color.value);
+  HTML.colorSquare.forEach(square => {
+    square.querySelector(".current_color").style.setProperty("--color", HTML.color.value);
+
+    square.querySelector(".hex").textContent = `Hex: ${HTML.color.value}`;
+    let rgbObject = hexToRGB(HTML.color.value);
+    square.querySelector(".rgb").textContent = `rgb(${rgbObject.r},${rgbObject.g},${rgbObject.b})`;
+    let hslObject = hexToHSL(HTML.color.value);
+    square.querySelector(".hsl").textContent = `hsl:(${hslObject.h.toFixed(1)},${hslObject.s.toFixed(1)},${hslObject.l.toFixed(1)})`;
+  });
+  HTML.colorBox.forEach(colorBox => {
+    // colorBox.style.setProperty("--color", HTML.color.value);
+  });
 }
 
 function hexToRGB(hex) {
-  let red;
-  let green;
-  let blue;
-  red = parseInt(hex.substring(1, 3), 16);
-  green = parseInt(hex.substring(3, 5), 16);
-  blue = parseInt(hex.substring(5, 7), 16);
-  return `R: ${red} G: ${green} B: ${blue}`;
+  let r;
+  let g;
+  let b;
+  r = parseInt(hex.substring(1, 3), 16);
+  g = parseInt(hex.substring(3, 5), 16);
+  b = parseInt(hex.substring(5, 7), 16);
+  //return `R: ${red} G: ${green} B: ${blue}`;
+  return { r, g, b };
 }
 
 function hexToHSL(hex) {
@@ -71,5 +81,6 @@ function hexToHSL(hex) {
   l = l / 2.55;
   console.log("L: " + l);
   console.log("hsl(%f,%f%,%f%)", h, s, l); // just for testing
-  return `H: ${h.toFixed(2)} S: ${s.toFixed(2)}% L: ${l.toFixed(2)}%`;
+  //return `H: ${h.toFixed(2)} S: ${s.toFixed(2)}% L: ${l.toFixed(2)}%`;
+  return { h, s, l };
 }
