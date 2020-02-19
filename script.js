@@ -4,176 +4,166 @@ window.addEventListener("DOMContentLoaded", start);
 
 window.addEventListener("click", setColor);
 
-let colorArray = ["", "", "", "", ""];
 //not sure why, but I cant return a html button value in a function, so a global is used
 let colorPaletteChoice;
 
 let HTML = {};
+
 function start() {
   HTML.colorSquare = document.querySelectorAll(".color_square");
   HTML.color = document.querySelector("#color_input");
-  /*   HTML.colorBox = document.querySelectorAll(".current_color");
-  HTML.hex = document.querySelectorAll(".hex");
-  HTML.rgb = document.querySelectorAll(".rgb");
-  HTML.hsl = document.querySelectorAll(".hsl"); */
   HTML.radio = document.querySelectorAll(".radio_button");
 }
 
 function setColor() {
-  //window[button.value]();
   let hslObject = hexToHSL(HTML.color.value);
-  /*   let colorPaletteChoice = checkRadio();
-  console.log("Palett " + colorPaletteChoice);
-  console.log("Palett " + checkRadio()); */
+
+  //let colorPaletteChoice = checkRadio();
   checkRadio();
   //call function that matches selection
-  window[colorPaletteChoice](hslObject);
+  let colorArray = window[colorPaletteChoice](hslObject);
   //console.log(colorArray);
   //analogous(hslObject);
   HTML.colorSquare.forEach((square, index) => {
-    //console.log("ColorArray: " + colorArray[index]);
+    //Get current HSL color from colorArray of HSL color objects and set it in html
     let hslColor = `hsl(${colorArray[index].h.toFixed(1)},${colorArray[index].s.toFixed(1)}\%,${colorArray[index].l.toFixed(1)}\%)`;
-    //console.log("hslColor: " + hslColor);
     square.querySelector(".current_color").style.setProperty("--color", hslColor);
-
-    //let rgbObject = hexToRGB(HTML.color.value);
-    let rgbColor = HSLToRGB(colorArray[index].h, colorArray[index].s, colorArray[index].l);
-    square.querySelector(".rgb").textContent = `rgb(${rgbColor.r},${rgbColor.g},${rgbColor.b})`;
-    //let hslObject = hexToHSL(HTML.color.value);
     square.querySelector(".hsl").textContent = hslColor;
 
+    //Get current color as RGB object from colorArray of HSL color objects and set it in html
+    let rgbColor = HSLToRGB(colorArray[index].h, colorArray[index].s, colorArray[index].l);
+    square.querySelector(".rgb").textContent = `rgb(${rgbColor.r},${rgbColor.g},${rgbColor.b})`;
+
+    //Get current color as hex object from current RGB object and set it in html
     let hexColor = RGBToHex(rgbColor.r, rgbColor.g, rgbColor.b);
     square.querySelector(".hex").textContent = `Hex: ${hexColor}`;
   });
-  /* HTML.colorBox.forEach(colorBox => {
-    // colorBox.style.setProperty("--color", HTML.color.value);
-  }); */
-  //console.log(colorArray);
 }
-
-/* function analogous(hsl) {
-  let analogousArray = [-40, -20, 20, 40];
-  const colorArray = [];
-  for (let i = 0; i < analogous.length; i++) {
-    colorArray.push(hsl);
-    colorArray[i].h = hsl.h + analogousArray[i];
-
-    if (colorArray[i].h < 0) {
-      colorArray[i].h = colorArray[i].h + 360;
-    }
-    console.log(colorArray[i]);
-  }
-  console.log(colorArray);
-  return colorArray;
-} */
 
 function checkRadio() {
   HTML.radio.forEach(button => {
     if (button.checked == true) {
-      //console.log("button value " + button.value);
       colorPaletteChoice = button.value;
-      //return "" + value;
+      //return button.value; how do I get this working without a global?
     }
   });
 }
 
-function analogous(hsl) {
-  let analogousArray = ["-40", "-20", "0", "20", "40"];
-  for (let i = 0; i < colorArray.length; i++) {
-    colorArray[i] = Object.create(hsl);
-    //console.log("analogousArray[i]: " + analogousArray[i]);
-    colorArray[i].h = Number(hsl.h) + Number(analogousArray[i]);
-
-    if (colorArray[i].h < 0) {
-      colorArray[i].h = colorArray[i].h + 360;
-    }
-    //console.log("colorArray: " + colorArray[i]);
-    //console.log("h values: " + colorArray[i].h);
+function checkWithin360(value) {
+  if (value < 0) {
+    value += 360;
+  } else if (value > 360) {
+    value -= 360;
   }
+  return value;
+}
+
+function checkWithin100(value) {
+  if (value < 0) {
+    value = 0;
+  } else if (value > 100) {
+    value = 100;
+  }
+  return value;
+}
+
+function analogous(hsl) {
+  let analogousArray = [-40, -20, 0, 20, 40];
+  let colorArray = [];
+  for (let i = 0; i < analogousArray.length; i++) {
+    colorArray.push(Object.create(hsl));
+
+    colorArray[i].h = hsl.h + analogousArray[i];
+
+    colorArray[i].h = checkWithin360(colorArray[i].h);
+  }
+  return colorArray;
 }
 
 function monochromatic(hsl) {
   let bool = false;
-  let analogousArray = ["-20", "-20", "0", "20", "20"];
-  for (let i = 0; i < colorArray.length; i++) {
-    colorArray[i] = Object.create(hsl);
-    //console.log("analogousArray[i]: " + analogousArray[i]);
+  const monochromaticArray = [-20, -20, 0, 20, 20];
+  const colorArray = [];
+  for (let i = 0; i < monochromaticArray.length; i++) {
+    colorArray.push(Object.create(hsl));
     if (bool) {
-      colorArray[i].s += Number(analogousArray[i]);
+      colorArray[i].s += monochromaticArray[i];
       bool = false;
     } else {
-      colorArray[i].l += Number(analogousArray[i]);
+      colorArray[i].l += monochromaticArray[i];
       bool = true;
     }
-
-    if (colorArray[i].h < 0) {
-      colorArray[i].h = colorArray[i].h + 360;
-    }
+    colorArray[i].s = checkWithin100(colorArray[i].s);
+    colorArray[i].l = checkWithin100(colorArray[i].l);
   }
+  return colorArray;
 }
 
 function triad(hsl) {
   let bool = false;
-  let analogousArray = ["-120", "120", "0", "-120", "120"];
-  for (let i = 0; i < colorArray.length; i++) {
-    colorArray[i] = Object.create(hsl);
-    //console.log("analogousArray[i]: " + analogousArray[i]);
-    colorArray[i].h += Number(analogousArray[i]);
+  const triadArray = [-120, 120, 0, -120, 120];
+  const colorArray = [];
+  for (let i = 0; i < triadArray.length; i++) {
+    colorArray.push(Object.create(hsl));
+    colorArray[i].h += triadArray[i];
+    colorArray[i].h = checkWithin360(colorArray[i].h);
     if (bool) {
-      colorArray[i].l += +20;
+      colorArray[i].l += 20;
+      colorArray[i].l = checkWithin100(colorArray[i].l);
       bool = false;
     } else {
       bool = true;
     }
-
-    if (colorArray[i].h < 0) {
-      colorArray[i].h = colorArray[i].h + 360;
-    }
   }
+  return colorArray;
 }
 
 function complementary(hsl) {
   let bool = false;
-  let analogousArray = ["180", "180", "0", "0", "0"];
-  for (let i = 0; i < colorArray.length; i++) {
-    colorArray[i] = Object.create(hsl);
-    //console.log("analogousArray[i]: " + analogousArray[i]);
-    colorArray[i].h += Number(analogousArray[i]);
+  let complementaryArray = [180, 180, 0, 0, 0];
+  const colorArray = [];
+  for (let i = 0; i < complementaryArray.length; i++) {
+    colorArray.push(Object.create(hsl));
+    colorArray[i].h += complementaryArray[i];
+    colorArray[i].h = checkWithin360(colorArray[i].h);
     if (bool) {
-      colorArray[i].l += +20;
+      colorArray[i].l += 20;
       bool = false;
+      colorArray[i].l = checkWithin100(colorArray[i].l);
     } else {
       bool = true;
     }
-
-    if (colorArray[i].h < 0) {
-      colorArray[i].h = colorArray[i].h + 360;
-    }
   }
+  return colorArray;
 }
+
 function compound(hsl) {
   let bool = false;
-  let analogousArray = ["180", "20", "0", "180", "-20"];
-  for (let i = 0; i < colorArray.length; i++) {
-    colorArray[i] = Object.create(hsl);
-    //console.log("analogousArray[i]: " + analogousArray[i]);
-    colorArray[i].h += Number(analogousArray[i]);
+  let compoundArray = [180, 20, 0, 180, -20];
+  const colorArray = [];
+  for (let i = 0; i < compoundArray.length; i++) {
+    colorArray.push(Object.create(hsl));
+    colorArray[i].h += compoundArray[i];
+    colorArray[i].h = checkWithin360(colorArray[i].h);
     if (!bool) {
-      colorArray[i].l += +20;
+      colorArray[i].l += 20;
+      colorArray[i].l = checkWithin100(colorArray[i].l);
       bool = true;
     }
-    if (colorArray[i].h < 0) {
-      colorArray[i].h = colorArray[i].h + 360;
-    }
   }
+  return colorArray;
 }
+
 function shades(hsl) {
-  let analogousArray = ["-30", "-15", "0", "15", "30"];
-  for (let i = 0; i < colorArray.length; i++) {
-    colorArray[i] = Object.create(hsl);
+  let shadesArray = [-30, -15, 0, 15, 30];
+  const colorArray = [];
+  for (let i = 0; i < shadesArray.length; i++) {
+    colorArray.push(Object.create(hsl));
     //console.log("analogousArray[i]: " + analogousArray[i]);
-    colorArray[i].l += Number(analogousArray[i]);
+    colorArray[i].l += shadesArray[i];
+    colorArray[i].l = checkWithin100(colorArray[i].l);
   }
+  return colorArray;
 }
 
 // This function is taken from https://css-tricks.com/converting-color-spaces-in-javascript/
