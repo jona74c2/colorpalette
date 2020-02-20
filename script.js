@@ -2,7 +2,11 @@
 
 window.addEventListener("DOMContentLoaded", start);
 
-window.addEventListener("click", setColor);
+//window.addEventListener("click", getColors);
+document.querySelector("#color_input").addEventListener("input", getColors);
+document.querySelectorAll(".radio_button").forEach(button => {
+  button.addEventListener("click", getColors);
+});
 
 //not sure why, but I cant return a html button value in a function, so a global is used
 let colorPaletteChoice;
@@ -15,13 +19,17 @@ function start() {
   HTML.radio = document.querySelectorAll(".radio_button");
 }
 
-function setColor() {
+function getColors() {
   let hslObject = hexToHSL(HTML.color.value);
 
   //let colorPaletteChoice = checkRadio();
   checkRadio();
   //call function that matches selection
   let colorArray = window[colorPaletteChoice](hslObject);
+  setColors(colorArray);
+}
+
+function setColors(colorArray) {
   //console.log(colorArray);
   //analogous(hslObject);
   HTML.colorSquare.forEach((square, index) => {
